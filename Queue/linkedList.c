@@ -4,21 +4,22 @@
 
 struct node
 {
-    struct node *front;
     int info;
-    struct node *rear;
+    struct node *link;
 };
 
+struct node *front = NULL;
+struct node *rear = NULL;
+
 // defining function
-struct node *enque(struct node *start, int data);
-int deque(struct node *start);
-int peek(struct node *start);
-void display(struct node *start);
+void enque(int data);
+int deque();
+int peek();
+void display();
 
 int main()
 {
-    struct node *start = NULL;
-    int choice, data;
+    int choice, data, n;
     while (1)
     {
         printf("\n1. Enque data");
@@ -38,48 +39,109 @@ int main()
             printf("Enter data: ");
             scanf("%d", &data);
 
-            start = enque(start, data);
-            display(start);
+            enque(data);
             break;
         case 2:
             system("cls");
-            start = deque(start);
-            // printf("your deleted item %d", deque());
-            display(start);
+            int dequelResult = deque();
+            if (dequelResult == -1)
+                break;
+            printf("your deleted item %d", dequelResult);
             break;
         case 3:
             system("cls");
-            int result = peek(start);
-            if (result == -1)
+            int peekResult = peek();
+            if (peekResult == -1)
                 break;
-            printf("your peek item %d", result);
+            printf("your peek item %d", peekResult);
             break;
         case 4:
             system("cls");
-            display(start);
+            display();
             break;
         case 5:
             printf("Program Exit");
             exit(0);
         case 6:
-            // for (int i = 0; i < MAX; i++)
-            // {
-            //     int random_num = (rand() % (50)) + 10;
-            //     enque(random_num);
-            // }
+            printf("Enter how long fake data you want to enter: ");
+            scanf("%d", &n);
+
+            for (int i = 0; i < n; i++)
+            {
+                int random_num = (rand() % (50) + n * 10) + 10;
+                enque(random_num);
+            }
+            printf("Fake data inserted in queue successfully.");
+            break;
         }
     }
 
     return 0;
 }
 
-struct node *enque(struct node *front, int data)
+void enque(int data)
 {
-    struct node *newNode = (struct node *)malloc(sizeof(struct node));
-    if (!newNode || newNode == NULL) {
-        printf("memory allocation failed");
+    struct node *temp = (struct node *)malloc(sizeof(struct node));
+
+    // while creating a node, memory can be full thats why we checked, 
+    if (!temp || temp == NULL)
+    {
+        printf("memory allocation failed, stack overflowed");
         exit(1);
     }
-    newNode->info = data;
-    
+
+    // making a node with default data
+    temp->info = data;
+    temp->link = NULL;
+
+    if (front == NULL) // before adding aany new node, we first need to check if there is already a node or not
+    {
+        front = temp;
+    }
+    else // if we have already an node, we just adding them as tail
+    {
+        rear->link = temp;
+    }
+    rear = temp;
+}
+
+int deque()
+{
+    if (front == NULL)
+    {
+        printf("the queue isn't initialized yet. please add data first.");
+        return -1;
+    }
+
+    int item = front->info;
+    struct node *temp;
+    temp = front;
+    front = front->link;
+    free(temp);
+    return item;
+}
+
+int peek()
+{
+    if (front == NULL)
+    {
+        printf("the queue isn't initialized yet. please add data first.");
+        return -1;
+    }
+    return front->info;
+}
+
+void display()
+{
+    if (front == NULL)
+    {
+        printf("the queue isn't initialized yet. please add data first.");
+        return;
+    }
+    struct node *p = front;
+    while (p != NULL)
+    {
+        printf("%d ", p->info);
+        p = p->link;
+    }
 }
